@@ -1,6 +1,6 @@
 package dataObjects;
 
-public class Task {
+public class CPUTask {
 	
 	public String name;
 	public int worstCaseComputationTime;
@@ -8,7 +8,7 @@ public class Task {
 	public int period;
 	public int deadline;
 	
-	public Task(String name, int wc, int c, int p, int d){
+	public CPUTask(String name, int wc, int c, int p, int d){
 		this.name = name;
 		this.worstCaseComputationTime = wc;
 		this.computationTime = c;

@@ -6,9 +6,9 @@ public class TaskInstance {
 	public int deadline;
 	public int remainingTime;
 	public int priority;
-	public Task parentTask;
+	public CPUTask parentTask;
 	
-	public TaskInstance (int number, int spawnTime, Task parent, int priority){
+	public TaskInstance (int number, int spawnTime, CPUTask parent, int priority){
 		this.instanceNumber = number;
 		this.deadline = spawnTime + parent.getDeadline();
 		this.remainingTime = parent.getComputationTime();
