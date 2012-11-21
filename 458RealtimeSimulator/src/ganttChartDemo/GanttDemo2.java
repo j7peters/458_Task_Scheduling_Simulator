@@ -88,7 +88,7 @@ public class GanttDemo2 extends ApplicationFrame {
             true,                // tooltips
             false                // urls
         );
-        ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setDateFormatOverride(new SimpleDateFormat("ss"));
+        ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setDateFormatOverride(new SimpleDateFormat("YYYY"));
         
         final CategoryPlot plot = (CategoryPlot) chart.getPlot();
   //      plot.getDomainAxis().setMaxCategoryLabelWidthRatio(10.0f);
@@ -124,13 +124,13 @@ public class GanttDemo2 extends ApplicationFrame {
         final TaskSeries s1 = new TaskSeries("Scheduled");
         
         final Task t1 = new Task(
-            "Write Proposal", dateSecond(0), dateSecond(3)
+            "Write Proposal", dateYear(0), dateYear(3)
         );
         t1.setPercentComplete(1.00);
         s1.add(t1);
         
         final Task t2 = new Task(
-            "Obtain Approval", dateSecond(3), dateSecond(5)
+            "Obtain Approval", dateYear(3), dateYear(5)
         );
         t2.setPercentComplete(1.00);
         s1.add(t2);
@@ -138,16 +138,16 @@ public class GanttDemo2 extends ApplicationFrame {
         // here is a task split into two subtasks...
         final Task t3 = new Task(
             "Requirements Analysis", 
-            dateSecond(5), dateSecond(80)
+            dateYear(5), dateYear(20)
         );
         final Task st31 = new Task(
             "Requirements 1", 
-            dateSecond(15), dateSecond(20)
+            dateYear(15), dateYear(20)
         );
         st31.setPercentComplete(1.0);
         final Task st32 = new Task(
             "Requirements 1", 
-            dateSecond(30), dateSecond(50)
+            dateYear(30), dateYear(50)
         );
         st32.setPercentComplete(1.0);
         t3.addSubtask(st31);
@@ -157,21 +157,21 @@ public class GanttDemo2 extends ApplicationFrame {
         // and another...
         final Task t4 = new Task(
             "Design Phase", 
-            dateSecond(30), dateSecond(50)
+            dateYear(30), dateYear(50)
         );
         final Task st41 = new Task(
              "Design 1", 
-             dateSecond(30), dateSecond(50)
+             dateYear(30), dateYear(50)
         );
         st41.setPercentComplete(1.0);
         final Task st42 = new Task(
             "Design 2", 
-            dateSecond(30), dateSecond(50)
+            dateYear(30), dateYear(50)
         );
         st42.setPercentComplete(1.0);
         final Task st43 = new Task(
             "Design 3", 
-            dateSecond(30), dateSecond(50)
+            dateYear(30), dateYear(50)
         );
         st43.setPercentComplete(0.50);
         t4.addSubtask(st41);
@@ -180,19 +180,19 @@ public class GanttDemo2 extends ApplicationFrame {
         s1.add(t4);
 
         final Task t5 = new Task(
-            "Design Signoff", dateSecond(30), dateSecond(50)
+            "Design Signoff", dateYear(30), dateYear(50)
         ); 
         s1.add(t5);
                         
         final Task t6 = new Task(
-            "Alpha Implementation", dateSecond(30), dateSecond(50)
+            "Alpha Implementation", dateYear(30), dateYear(50)
         );
         t6.setPercentComplete(0.60);
         
         s1.add(t6);
         
         final Task t7 = new Task(
-            "Design Review", dateSecond(30), dateSecond(50)
+            "Design Review", dateYear(30), dateYear(50)
         );
         t7.setPercentComplete(0.0);
         s1.add(t7);
@@ -222,10 +222,10 @@ public class GanttDemo2 extends ApplicationFrame {
 
     }
     
-    private static Date dateSecond(final int second) {
+    private static Date dateYear(final int year) {
 
         final Calendar calendar = Calendar.getInstance();
-        calendar.set(2012, 01, 01, 01, 0, second);
+        calendar.set(year, 01, 01, 01, 0, 0);
         final Date result = calendar.getTime();
         return result;
 
