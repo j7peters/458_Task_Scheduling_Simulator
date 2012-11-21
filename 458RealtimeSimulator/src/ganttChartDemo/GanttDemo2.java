@@ -48,8 +48,9 @@ import java.util.Date;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.IntervalCategoryDataset;
@@ -65,6 +66,10 @@ import org.jfree.ui.RefineryUtilities;
  *
  */
 public class GanttDemo2 extends ApplicationFrame {
+	
+	private final int majorTicks = 10;
+	
+	private final int minorTicks = 10;
 
     /**
      * Creates a new demo.
@@ -88,10 +93,16 @@ public class GanttDemo2 extends ApplicationFrame {
             true,                // tooltips
             false                // urls
         );
+        // set format so displays years, looks like integers allows us large range
         ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setDateFormatOverride(new SimpleDateFormat("YYYY"));
         
+        
+        ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setTickUnit(new DateTickUnit(DateTickUnitType.YEAR, majorTicks));
+        ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickCount(minorTicks);
+        ((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickMarksVisible(true);
+        
+        
         final CategoryPlot plot = (CategoryPlot) chart.getPlot();
-  //      plot.getDomainAxis().setMaxCategoryLabelWidthRatio(10.0f);
         final CategoryItemRenderer renderer = plot.getRenderer();
         renderer.setSeriesPaint(0, Color.blue);
 
