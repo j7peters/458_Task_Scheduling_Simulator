@@ -5,6 +5,10 @@ import java.util.Date;
 
 public class Util {
 
+	public static final int tabWindowWidth = 800;
+	
+	public static final int tabWindowHeight = 500;
+	
 	private static int lcm(int a, int b)
 	{
 	    return a * (b / gcd(a, b));

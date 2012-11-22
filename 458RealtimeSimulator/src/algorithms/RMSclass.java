@@ -38,25 +38,27 @@ public class RMSclass {
 		ArrayList<CPUTask> tmpTasks = (ArrayList<CPUTask>) taskList.clone();
 		numTasks = taskList.size();
 
-		int[] periods = new int[numTasks];
-		taskInstances = new TaskInstance[numTasks];
-		graphTasks = new Task[numTasks];
+		if(numTasks > 0){
+			int[] periods = new int[numTasks];
+			taskInstances = new TaskInstance[numTasks];
+			graphTasks = new Task[numTasks];
 
-		//create a list of prioritized tasks
-		for(int i = 0; i<numTasks;i++){
-			int min=0;
-			for(int j = 0; j<tmpTasks.size();j++){
-				if(tmpTasks.get(j).period < tmpTasks.get(min).period){
-					min = j;
+			//create a list of prioritized tasks
+			for(int i = 0; i<numTasks;i++){
+				int min=0;
+				for(int j = 0; j<tmpTasks.size();j++){
+					if(tmpTasks.get(j).period < tmpTasks.get(min).period){
+						min = j;
+					}
 				}
+				priorityTaskList.add(tmpTasks.get(min));
+				periods[i]=tmpTasks.get(min).period;
+				tmpTasks.remove(min);
 			}
-			priorityTaskList.add(tmpTasks.get(min));
-			periods[i]=tmpTasks.get(min).period;
-			tmpTasks.remove(min);
-		}
 
-		//compute the least common multiple
-		lcm = Util.lcm(periods);
+			//compute the least common multiple
+			lcm = Util.lcm(periods);
+		}
 	}
 
 	/**
@@ -73,13 +75,26 @@ public class RMSclass {
 			taskInstances[i] = new TaskInstance(i, 1, priorityTaskList.get(i), i);
 		}
 		TaskInstance curTaskInstance;
+		boolean curTimeUsed = false;
 
 		//loop through and schedule all the tasks based on priority
-		for(int now = 1; now<lcm; now++){
+		for(int now = 1; now<=lcm;){
+			curTimeUsed = false;
 
-			for(int j=0; j<numTasks; j++){
+			for(int j=0; j<numTasks && curTimeUsed == false; j++){
 				if(taskInstances[j].readyTime <= now){
-					int c = taskInstances[j].remainingTime;
+					int rt = taskInstances[j].remainingTime;
+
+					//actual amount of computation to be allotted
+					int c = rt;
+
+					//allow for preemmption by higher priority tasks
+					for(int higherPriority = j - 1; higherPriority >=0; higherPriority--){
+						if(taskInstances[higherPriority].readyTime < now + c){
+							c = taskInstances[higherPriority].readyTime - now;
+						}
+					}
+
 					if(taskInstances[j].useComputationTime(now, now + c)){
 						final Task st32 = new Task(
 								taskInstances[j].parentTask.getName(), 
@@ -88,16 +103,23 @@ public class RMSclass {
 						st32.setPercentComplete(1.0);
 						graphTasks[j].addSubtask(st32);
 
-						curTaskInstance = new TaskInstance(	j, 
-								taskInstances[j].readyTime + taskInstances[j].parentTask.period, 
-								taskInstances[j].parentTask, 
-								j);
-						taskInstances[j] = curTaskInstance;
+						if(taskInstances[j].remainingTime <= 0){
+							curTaskInstance = new TaskInstance(	j, 
+									taskInstances[j].readyTime + taskInstances[j].parentTask.period, 
+									taskInstances[j].parentTask, 
+									j);
+							taskInstances[j] = curTaskInstance;
+						}
+						System.out.println("now="+ now +", c="+c+", j="+j+", pre rt="+rt+", post rt="+taskInstances[j].remainingTime);
 						now = now + c;
+						curTimeUsed = true;
+					} else {
+						System.out.println("FAIL:" + "now="+ now +", c="+c+", j="+j+", pre rt="+rt+", post rt="+taskInstances[j].remainingTime);
 					}
-				} else {
-					//TODO flag as not valid
-				}
+				} 
+			}
+			if(curTimeUsed == false){
+				now++;
 			}
 		}
 

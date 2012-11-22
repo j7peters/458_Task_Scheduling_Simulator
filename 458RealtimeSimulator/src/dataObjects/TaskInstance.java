@@ -22,7 +22,7 @@ public class TaskInstance {
 		if(end<begin){
 			//bad input
 			return false;
-		} else if(end > deadline || begin > deadline){
+		} else if(end > deadline+1 || begin > deadline){
 			//past deadline
 			return false;
 		}

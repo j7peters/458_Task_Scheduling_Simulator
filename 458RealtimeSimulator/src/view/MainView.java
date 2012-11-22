@@ -34,6 +34,8 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.IntervalCategoryDataset;
 
+import algorithms.Util;
+
 import controller.TaskSchedulerController;
 
 public class MainView extends JFrame implements ActionListener{
@@ -61,9 +63,9 @@ public class MainView extends JFrame implements ActionListener{
 
 
 
-	private final int majorTicks = 10;
+	private final int majorTicks = 5;
 
-	private final int minorTicks = 10;
+	private final int minorTicks = 5;
 
 	/**
 	 * Formatted Text Fields
@@ -92,7 +94,7 @@ public class MainView extends JFrame implements ActionListener{
 	MainView()
 	{	
 		super("Real Time Systems Simulator: CprE 458");
-		setSize(800,500);
+		setSize(Util.tabWindowWidth, Util.tabWindowHeight);
 
 		this.myTaskEditorPanel = getTaskEditorPanel();
 		this.myTaskListPane = getTaskListPane();
@@ -269,7 +271,9 @@ public class MainView extends JFrame implements ActionListener{
 		// set minor ticks to be every 10 so there is a tick for every year, set minor ticks visible
 		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickCount(minorTicks);
 		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickMarksVisible(true);
-
+		
+		// set minimum date
+		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinimumDate(Util.dateYear(1));
 
 		final CategoryPlot plot = (CategoryPlot) chart.getPlot();
 		final CategoryItemRenderer renderer = plot.getRenderer();
@@ -277,7 +281,7 @@ public class MainView extends JFrame implements ActionListener{
 
 		// add the chart to a panel...
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+		chartPanel.setPreferredSize(new java.awt.Dimension(Util.tabWindowWidth-50, Util.tabWindowHeight-100));
 		return chartPanel;
 	}
 

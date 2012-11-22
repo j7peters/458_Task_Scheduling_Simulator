@@ -116,7 +116,7 @@ public class TaskSchedulerController {
 		//TODO if RMS
 		RMSclass scheduler = new RMSclass(this.taskList, this.view.chartDataset);
 		
-		if(scheduler.createSchedule()){
+		if(scheduler.createSchedule() && this.taskList.size() > 0){
 			this.view.chartDataset = scheduler.getChartDataset();
 			this.view.refreshChartPanel();
 		} else {
