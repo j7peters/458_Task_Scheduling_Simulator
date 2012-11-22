@@ -3,14 +3,12 @@ package dataObjects;
 public class CPUTask {
 	
 	public String name;
-	public int worstCaseComputationTime;
 	public int computationTime;
 	public int period;
 	public int deadline;
 	
-	public CPUTask(String name, int wc, int c, int p, int d){
+	public CPUTask(String name, int c, int p, int d){
 		this.name = name;
-		this.worstCaseComputationTime = wc;
 		this.computationTime = c;
 		this.period = p;
 		this.deadline = d;
@@ -30,5 +28,9 @@ public class CPUTask {
 	}
 	public int getDeadline() {
 		return deadline;
+	}
+	
+	public String toString(){
+		return name + "={ "+ computationTime + ", " + period + ", " + deadline +" }";
 	}
 }
