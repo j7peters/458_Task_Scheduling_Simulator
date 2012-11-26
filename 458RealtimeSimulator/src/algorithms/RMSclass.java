@@ -31,11 +31,18 @@ public class RMSclass {
 	 * @param taskList - list of tasks to be performed
 	 * @param chartDataset - category dataset to be given to the JFreeChart Gantt chart
 	 */
+	@SuppressWarnings("unchecked")
 	public RMSclass(ArrayList<CPUTask> taskList, IntervalCategoryDataset chartDataset) {
 
 		priorityTaskList = new ArrayList<CPUTask>();
-
-		ArrayList<CPUTask> tmpTasks = (ArrayList<CPUTask>) taskList.clone();
+		ArrayList<CPUTask> tmpTasks = new ArrayList<CPUTask>();
+		
+		try{
+			tmpTasks = (ArrayList<CPUTask>) taskList.clone();			
+		} catch (Exception e){
+			System.err.println("Error cloning CPUTask list.");
+		}
+		
 		numTasks = taskList.size();
 
 		if(numTasks > 0){
@@ -68,11 +75,11 @@ public class RMSclass {
 	public boolean createSchedule(){
 		//setup tasks
 		for(int i=0; i<numTasks; i++){
-			graphTasks[i] = new Task(
-					priorityTaskList.get(i).getName(), Util.dateYear(1), Util.dateYear(lcm)
-					);
+			
+			graphTasks[i] = Util.createTask(priorityTaskList.get(i).getName(), 1, lcm);
+			
 			s1.add(graphTasks[i]);
-			taskInstances[i] = new TaskInstance(i, 1, priorityTaskList.get(i), i);
+			taskInstances[i] = new TaskInstance(1, 1, priorityTaskList.get(i), i);
 		}
 		TaskInstance curTaskInstance;
 		boolean curTimeUsed = false;
@@ -96,15 +103,12 @@ public class RMSclass {
 					}
 
 					if(taskInstances[j].useComputationTime(now, now + c)){
-						final Task st32 = new Task(
-								taskInstances[j].parentTask.getName(), 
-								Util.dateYear(now), Util.dateYear(now + c)
-								);
+						final Task st32 = Util.createTask(taskInstances[j].parentTask.getName(), now, now + c);
 						st32.setPercentComplete(1.0);
 						graphTasks[j].addSubtask(st32);
 
 						if(taskInstances[j].remainingTime <= 0){
-							curTaskInstance = new TaskInstance(	j, 
+							curTaskInstance = new TaskInstance(	taskInstances[j].instanceNumber + 1, 
 									taskInstances[j].readyTime + taskInstances[j].parentTask.period, 
 									taskInstances[j].parentTask, 
 									j);

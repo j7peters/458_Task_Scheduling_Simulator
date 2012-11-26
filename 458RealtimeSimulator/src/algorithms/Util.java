@@ -3,6 +3,8 @@ package algorithms;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.jfree.data.gantt.Task;
+
 public class Util {
 
 	public static final int tabWindowWidth = 800;
@@ -30,6 +32,10 @@ public class Util {
 	        a = temp;
 	    }
 	    return a;
+	}
+	
+	public static Task createTask(String name, int start, int end){
+		return new Task(name, Util.dateYear(start), Util.dateYear(end));
 	}
 	
 	public static Date dateYear(final int year) {
