@@ -40,13 +40,22 @@ import controller.TaskSchedulerController;
 
 public class MainView extends JFrame implements ActionListener{
 
-	public IntervalCategoryDataset chartDataset;
+	public IntervalCategoryDataset RMSchartDataset;
+	public IntervalCategoryDataset EDFchartDataset;
+	public IntervalCategoryDataset DMSchartDataset;
+	public IntervalCategoryDataset LLFchartDataset;
 
 	public JTabbedPane myTabbedPane = new JTabbedPane();
 
-	public ChartPanel myChartPanel;
-	
-	public JPanel myGanttPanel;
+	public ChartPanel RMSChartPanel;
+	public ChartPanel EDFChartPanel;
+	public ChartPanel DMSChartPanel;
+	public ChartPanel LLFChartPanel;
+
+	public JPanel RMSGanttPanel;
+	public JPanel EDFGanttPanel;
+	public JPanel DMSGanttPanel;
+	public JPanel LLFGanttPanel;
 
 	public JPanel myTaskEditorPanel;
 
@@ -103,23 +112,56 @@ public class MainView extends JFrame implements ActionListener{
 
 		this.myTabbedPane.add("Task Editor", this.myTaskSplitPane);
 
-		this.myChartPanel = getChartPanel();
-		this.myGanttPanel = new JPanel();
-		this.myGanttPanel.add(this.myChartPanel);
-		this.myTabbedPane.add("Task Schedule", this.myGanttPanel);
+		// RMS
+		this.RMSGanttPanel = new JPanel();
+
+		// EDF
+		this.EDFGanttPanel = new JPanel();
+
+		// DMS
+		this.DMSGanttPanel = new JPanel();
+
+		// LLF
+		this.LLFGanttPanel = new JPanel();
+		
+		this.myTabbedPane.add("RMS Schedule", this.RMSGanttPanel);
+		this.myTabbedPane.add("EDF Schedule", this.EDFGanttPanel);
+		this.myTabbedPane.add("DMS Schedule", this.DMSGanttPanel);
+		this.myTabbedPane.add("LLF Schedule", this.LLFGanttPanel);
+
+		refreshChartPanel();
 
 		this.controller = new TaskSchedulerController(this);
 
 		setContentPane(this.myTabbedPane);
+		
+		this.myTabbedPane.setSelectedIndex(0);
 	}
 
 	public void refreshChartPanel(){
-		this.myGanttPanel.removeAll();
-		this.myChartPanel = getChartPanel();
-		this.myGanttPanel.add(this.myChartPanel);
+		// RMS
+		this.RMSChartPanel = getChartPanel(this.RMSchartDataset);
+		this.RMSGanttPanel.removeAll();
+		this.RMSGanttPanel.add(this.RMSChartPanel);
+
+		// EDF
+		this.EDFChartPanel = getChartPanel(this.EDFchartDataset);
+		this.EDFGanttPanel.removeAll();
+		this.EDFGanttPanel.add(this.EDFChartPanel);
+
+		// DMS
+		this.DMSChartPanel = getChartPanel(this.DMSchartDataset);
+		this.DMSGanttPanel.removeAll();
+		this.DMSGanttPanel.add(this.DMSChartPanel);
+
+		// LLF
+		this.LLFChartPanel = getChartPanel(this.LLFchartDataset);
+		this.LLFGanttPanel.removeAll();
+		this.LLFGanttPanel.add(this.LLFChartPanel);
+
 		this.myTabbedPane.setSelectedIndex(1);
 	}
-	
+
 	public JPanel getTaskListPane(){
 		this.myTaskListModel = new DefaultListModel<String>();
 		this.myTaskList = new JList<String>(this.myTaskListModel); //data has type Object[]
@@ -178,7 +220,7 @@ public class MainView extends JFrame implements ActionListener{
 		JPanel buttonPanel= new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
-		
+
 		//add
 		JButton btnAdd = new JButton("Add Task");
 		btnAdd.setVerticalTextPosition(AbstractButton.BOTTOM);
@@ -202,7 +244,7 @@ public class MainView extends JFrame implements ActionListener{
 		btnEdit.setAlignmentX(Component.CENTER_ALIGNMENT);
 		buttonPanel.add(btnEdit);
 		buttonPanel.add(Box.createRigidArea(new Dimension(0,10)));
-		
+
 		//overwrite
 		JButton btnOverwrite = new JButton("Overwrite Selected Task");
 		btnOverwrite.setVerticalTextPosition(AbstractButton.BOTTOM);
@@ -214,7 +256,7 @@ public class MainView extends JFrame implements ActionListener{
 		btnOverwrite.setAlignmentX(Component.CENTER_ALIGNMENT);
 		buttonPanel.add(btnOverwrite);
 		buttonPanel.add(Box.createRigidArea(new Dimension(0,10)));
-		
+
 		//delete
 		JButton btnDelete = new JButton("Delete Selected Task");
 		btnDelete.setVerticalTextPosition(AbstractButton.BOTTOM);
@@ -238,18 +280,18 @@ public class MainView extends JFrame implements ActionListener{
 		btnSchedule.setAlignmentX(Component.CENTER_ALIGNMENT);
 		buttonPanel.add(btnSchedule);
 		buttonPanel.add(Box.createRigidArea(new Dimension(0,10)));
-		
-		
+
+
 		tmpJPanel.add(buttonPanel);
-		
+
 		tmpJPanel.setPreferredSize(new Dimension(250, 400));
 		return tmpJPanel;
 	}
 
 
-	public ChartPanel getChartPanel(){
+	public ChartPanel getChartPanel(IntervalCategoryDataset chartInput){
 
-		final IntervalCategoryDataset dataset = chartDataset;
+		final IntervalCategoryDataset dataset = chartInput;
 
 
 		// create the chart...
@@ -271,7 +313,7 @@ public class MainView extends JFrame implements ActionListener{
 		// set minor ticks to be every 10 so there is a tick for every year, set minor ticks visible
 		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickCount(minorTicks);
 		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinorTickMarksVisible(true);
-		
+
 		// set minimum date
 		((DateAxis)(chart.getCategoryPlot().getRangeAxis())).setMinimumDate(Util.dateYear(1));
 

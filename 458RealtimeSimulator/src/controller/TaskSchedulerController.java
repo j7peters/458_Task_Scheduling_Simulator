@@ -114,10 +114,10 @@ public class TaskSchedulerController {
 	
 	public void scheduleTasks(){
 		//TODO if RMS
-		RMSclass scheduler = new RMSclass(this.taskList, this.view.chartDataset);
+		RMSclass scheduler = new RMSclass(this.taskList, this.view.RMSchartDataset);
 		
 		if(scheduler.createSchedule() && this.taskList.size() > 0){
-			this.view.chartDataset = scheduler.getChartDataset();
+			this.view.RMSchartDataset = scheduler.getChartDataset();
 			this.view.refreshChartPanel();
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
