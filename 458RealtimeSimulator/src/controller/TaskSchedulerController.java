@@ -33,6 +33,18 @@ public class TaskSchedulerController {
 	public void addTaskData(){
 		try{
 			String name = (String) this.view.ftfTaskName.getText();
+			
+			// don't allow duplicate names
+			for(CPUTask t : taskList){
+				if(name.equals(t.getName())){
+					JOptionPane.showMessageDialog(this.view.getContentPane(),
+							"Please use a different task name, that one is already used",
+							"Name Input Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
+			
 			int compTime =  Integer.parseInt(this.view.ftfComputationTime.getText());
 			int period = Integer.parseInt(this.view.ftfPeriod.getText());
 			int deadline = Integer.parseInt(this.view.ftfDeadline.getText());
@@ -57,12 +69,26 @@ public class TaskSchedulerController {
 		if(selected >= 0){
 			try{
 				String name = (String) this.view.ftfTaskName.getText();
+				
+				CPUTask tempTask = taskList.remove(selected);
+				
+				// don't allow duplicate names
+				for(CPUTask t : taskList){
+					if(name.equals(t.getName())){
+						JOptionPane.showMessageDialog(this.view.getContentPane(),
+								"Please use a different task name, that one is already used",
+								"Name Input Error",
+								JOptionPane.ERROR_MESSAGE);
+						taskList.add(selected, tempTask);
+						return;
+					}
+				}
+				
 				int compTime =  Integer.parseInt(this.view.ftfComputationTime.getText());
 				int period = Integer.parseInt(this.view.ftfPeriod.getText());
 				int deadline = Integer.parseInt(this.view.ftfDeadline.getText());
 
 				CPUTask newTask = new CPUTask(name, compTime, period, deadline);
-				taskList.remove(selected);
 				taskList.add(selected, newTask);
 
 				this.view.ftfTaskName.setText("");
@@ -112,11 +138,17 @@ public class TaskSchedulerController {
 	}
 
 	public void refreshTaskList(){
+		int prevSelected = this.view.myTaskList.getSelectedIndex();
 		this.view.myTaskListModel.removeAllElements();
 		for(CPUTask p : taskList){
 			this.view.myTaskListModel.addElement(p.toString());
 		}
-		this.view.myTaskList.setSelectedIndex(0);
+		
+		if(this.view.myTaskList.getModel().getSize() > prevSelected && prevSelected > -1){
+			this.view.myTaskList.setSelectedIndex(prevSelected);
+		} else if(this.view.myTaskList.getModel().getSize() > 0){
+			this.view.myTaskList.setSelectedIndex(0);			
+		}
 	}
 
 	public void scheduleTasks(){
