@@ -1,6 +1,7 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.jfree.data.category.IntervalCategoryDataset;
 import org.jfree.data.gantt.Task;
@@ -10,7 +11,7 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import dataObjects.CPUTask;
 import dataObjects.TaskInstance;
 
-public class RMSclass {
+public class DMSclass {
 
 	public TaskSeriesCollection chartDataset;
 
@@ -34,7 +35,7 @@ public class RMSclass {
 	 * @param chartDataset - category dataset to be given to the JFreeChart Gantt chart
 	 */
 	@SuppressWarnings("unchecked")
-	public RMSclass(ArrayList<CPUTask> taskList, IntervalCategoryDataset chartDataset) {
+	public DMSclass(ArrayList<CPUTask> taskList, IntervalCategoryDataset chartDataset) {
 
 		priorityTaskList = new ArrayList<CPUTask>();
 		ArrayList<CPUTask> tmpTasks = new ArrayList<CPUTask>();
@@ -50,6 +51,8 @@ public class RMSclass {
 
 		if(numTasks > 0){
 			int[] periods = new int[numTasks];
+			ArrayList<String> TaskNames = new ArrayList<String>();
+			
 			taskInstances = new TaskInstance[numTasks];
 			graphTasks = new Task[numTasks];
 			
@@ -73,7 +76,7 @@ public class RMSclass {
 			for(int i = 0; i<numTasks;i++){
 				int min=0;
 				for(int j = 0; j<tmpTasks.size();j++){
-					if(tmpTasks.get(j).period < tmpTasks.get(min).period){
+					if(tmpTasks.get(j).deadline < tmpTasks.get(min).deadline){
 						min = j;
 					}
 				}
@@ -131,7 +134,6 @@ public class RMSclass {
 						now = now + c;
 						curTimeUsed = true;
 					} else {
-						//TODO somehow notify the user.
 						System.out.println("FAIL:" + "now="+ now +", c="+c+", j="+j+", pre rt="+rt+", post rt="+taskInstances[j].remainingTime);
 					}
 				} 
@@ -151,4 +153,29 @@ public class RMSclass {
 		return chartDataset;
 	}
 
+}
+
+class DMSComparatorCPUTask implements Comparator<CPUTask>{
+
+	@Override
+	public int compare(CPUTask o1, CPUTask o2) {
+		//this sorts the parent tasks
+		if(o1.deadline < o2.deadline){
+			return -1;
+		} else if(o1.deadline > o2.deadline){
+			return 1;
+		}
+		return 0;
+	}
+	
+}
+
+class DMSComparatorTaskInstance implements Comparator<TaskInstance>{
+
+	@Override
+	public int compare(TaskInstance o1, TaskInstance o2) {
+		// no dynamic sorting is done
+		return 0;
+	}
+	
 }
