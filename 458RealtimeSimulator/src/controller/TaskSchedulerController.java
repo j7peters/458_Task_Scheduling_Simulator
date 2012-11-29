@@ -7,10 +7,12 @@ import javax.swing.JOptionPane;
 import view.MainView;
 import algorithms.DMSComparatorParent;
 import algorithms.DMSComparatorTaskInstance;
-import algorithms.DMSclass;
+import algorithms.EDFComparatorParent;
+import algorithms.EDFComparatorTaskInstance;
+import algorithms.LLFComparatorParent;
+import algorithms.LLFComparatorTaskInstance;
 import algorithms.RMSComparatorParent;
 import algorithms.RMSComparatorTaskInstance;
-import algorithms.RMSclass;
 import algorithms.Scheduler;
 import dataObjects.CPUTask;
 
@@ -130,8 +132,7 @@ public class TaskSchedulerController {
 
 		// EDF
 		if(this.taskList.size() > 0){
-			//TODO make edf
-			this.view.EDFchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
+			this.view.EDFchartDataset = Scheduler.createSchedule(this.taskList, new EDFComparatorParent(), new EDFComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make EDFschedule.",
@@ -151,9 +152,7 @@ public class TaskSchedulerController {
 
 		// LLF
 		if(this.taskList.size() > 0){
-			
-			//TODO make LLF
-			this.view.DMSchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
+			this.view.LLFchartDataset = Scheduler.createSchedule(this.taskList, new LLFComparatorParent(), new LLFComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make LLF schedule.",

@@ -88,10 +88,14 @@ public class Scheduler {
 		//loop through and schedule all the tasks based on priority
 		for(int now = 1; now<=lcm;){
 			curTimeUsed = false;
+			
+			//recalculate laxity for each task incase this is running LLF
+			computeTaskLaxities(taskInstances, now);
+			
+			//resort the task instances for dynamic priority algorithms
+			Collections.sort(taskInstances, instanceComparator);
 
 			for(int j=0; j<numTasks && curTimeUsed == false; j++){
-				//resort the task instances for dynamic priority algorithms
-				Collections.sort(taskInstances, instanceComparator);
 
 				if(taskInstances.get(j).readyTime <= now){
 					int rt = taskInstances.get(j).remainingTime;
@@ -137,6 +141,12 @@ public class Scheduler {
 		toReturnTaskSeries.add(s1);
 
 		return toReturnTaskSeries;
+	}
+	
+	public static void computeTaskLaxities(ArrayList<TaskInstance> taskInstances, int curTime){
+		for( TaskInstance ti : taskInstances){
+			ti.computeLaxity(curTime);
+		}
 	}
 
 }

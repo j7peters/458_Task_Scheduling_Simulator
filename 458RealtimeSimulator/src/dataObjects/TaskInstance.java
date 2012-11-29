@@ -7,6 +7,7 @@ public class TaskInstance {
 	public int remainingTime;
 	public int priority;
 	public int readyTime;
+	public int laxity;
 	public CPUTask parentTask;
 	
 	public TaskInstance (int number, int readyTime, CPUTask parent, int priority){
@@ -16,6 +17,9 @@ public class TaskInstance {
 		this.remainingTime = parent.getComputationTime();
 		this.priority = priority;
 		this.parentTask = parent;
+		
+		//initialize to large number
+		this.laxity = 10000;
 	}
 	
 	public boolean useComputationTime(int begin, int end){
@@ -38,8 +42,9 @@ public class TaskInstance {
 	}
 	
 	
-	public int calculateLaxity(int curTime){
-		return deadline - curTime - remainingTime;
+	public int computeLaxity(int curTime){
+		this.laxity = deadline - curTime - remainingTime;
+		return this.laxity;
 	}
 	
 }
