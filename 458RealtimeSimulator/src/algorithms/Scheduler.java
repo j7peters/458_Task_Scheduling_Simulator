@@ -15,89 +15,84 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import dataObjects.CPUTask;
 import dataObjects.TaskInstance;
 
-public class DMSrefactor {
-
-	public TaskSeriesCollection chartDataset;
-
-	public ArrayList<TaskInstance> taskInstances;
-
-	Map<String, Task> graphTasks;
-
-	public ArrayList<CPUTask> priorityTaskList;
-
-	final TaskSeries s1 = new TaskSeries("Scheduled");
-
-	public int lcm;
-
-	public int numTasks=0;
-
-	/**
-	 * This will create an RMS scheduler for the given task set
-	 * @param taskList - list of tasks to be performed
-	 * @param chartDataset - category dataset to be given to the JFreeChart Gantt chart
-	 */
-	@SuppressWarnings("unchecked")
-	public DMSrefactor(ArrayList<CPUTask> taskList, IntervalCategoryDataset chartDataset) {
-
-		priorityTaskList = new ArrayList<CPUTask>();
-		
-		try{
-			priorityTaskList = (ArrayList<CPUTask>) taskList.clone();			
-		} catch (Exception e){
-			System.err.println("Error cloning CPUTask list.");
-		}
-		
-		numTasks = taskList.size();
-
-		if(numTasks > 0){
-			int[] periods = new int[numTasks];
-			ArrayList<String> TaskNames = new ArrayList<String>();
-			
-			taskInstances = new ArrayList<TaskInstance>();
-			graphTasks = new HashMap<String, Task>();
-			
-			// store the periods to find lcm, store names to get the order right later
-			for(int i=0; i<numTasks; i++){
-				periods[i]=priorityTaskList.get(i).period;
-				TaskNames.add(priorityTaskList.get(i).getName());
-			}
-			
-			//compute the least common multiple
-			lcm = Util.lcm(periods);
-
-			//setup tasks
-			for(int i=0; i<numTasks; i++){
-				graphTasks.put(TaskNames.get(i), Util.createTask(TaskNames.get(i), 1, lcm));
-				s1.add(graphTasks.get(TaskNames.get(i)));
-			}
-			
-			Collections.sort(priorityTaskList, new DMSComparatorCPUTask());
-			
-			//create a list of prioritized tasks
-			for(int i = 0; i<numTasks;i++){				
-				taskInstances.add(new TaskInstance(1, 1, priorityTaskList.get(i), i));
-			}
-
-			
-		}
-	}
+public class Scheduler {
 
 	/**
 	 * Create the chartDataset to store the schedule
 	 * @return True if success, otherwise false
 	 */
-	public boolean createSchedule(){
+	public static TaskSeriesCollection createSchedule(ArrayList<CPUTask> taskList,
+			Comparator<CPUTask> parentComparator, Comparator<TaskInstance> instanceComparator){
+
+		//create all variables needed
+		TaskSeriesCollection toReturnTaskSeries = new TaskSeriesCollection();
+
+		ArrayList<TaskInstance> taskInstances = new ArrayList<TaskInstance>();
+
+		Map<String, Task> graphTasks = new HashMap<String, Task>();
+
+		ArrayList<CPUTask> priorityTaskList = new ArrayList<CPUTask>();
+
+		final TaskSeries s1 = new TaskSeries("Scheduled");
+
+		int lcm = 0;
+
+		int numTasks = 0;
+		
 		TaskInstance curTaskInstance;
+		
 		boolean curTimeUsed = false;
 
+	/* Set up tasks and background information */
+		try{
+			priorityTaskList = (ArrayList<CPUTask>) taskList.clone();			
+		} catch (Exception e){
+			System.err.println("Error cloning CPUTask list.");
+		}
+
+		numTasks = taskList.size();
+
+		//no tasks in list nothing to schedule
+		if(numTasks <= 0){
+			return toReturnTaskSeries;
+		}
+		
+		int[] periods = new int[numTasks];
+		ArrayList<String> TaskNames = new ArrayList<String>();
+
+		// store the periods to find lcm, store names to get the order right later
+		for(int i=0; i<numTasks; i++){
+			periods[i]=priorityTaskList.get(i).period;
+			TaskNames.add(priorityTaskList.get(i).getName());
+		}
+
+		//compute the least common multiple
+		lcm = Util.lcm(periods);
+
+		//setup tasks
+		for(int i=0; i<numTasks; i++){
+			graphTasks.put(TaskNames.get(i), Util.createTask(TaskNames.get(i), 1, lcm));
+			s1.add(graphTasks.get(TaskNames.get(i)));
+		}
+
+		//Sort the parent tasks based on comparator
+		Collections.sort(priorityTaskList, parentComparator);
+
+		//create a list of prioritized tasks
+		for(int i = 0; i<numTasks;i++){				
+			taskInstances.add(new TaskInstance(1, 1, priorityTaskList.get(i), i));
+		}
+
+
+	/* Scheduling by looping through tasks */
 		//loop through and schedule all the tasks based on priority
 		for(int now = 1; now<=lcm;){
 			curTimeUsed = false;
 
 			for(int j=0; j<numTasks && curTimeUsed == false; j++){
 				//resort the task instances for dynamic priority algorithms
-				Collections.sort(taskInstances, new DMSComparatorTaskInstance());
-				
+				Collections.sort(taskInstances, instanceComparator);
+
 				if(taskInstances.get(j).readyTime <= now){
 					int rt = taskInstances.get(j).remainingTime;
 
@@ -137,14 +132,11 @@ public class DMSrefactor {
 			}
 		}
 
-		chartDataset = new TaskSeriesCollection();
-		chartDataset.add(s1);
 
-		return true;
-	}
+		//return the taskseries with the graphed tasks added to it.
+		toReturnTaskSeries.add(s1);
 
-	public IntervalCategoryDataset getChartDataset() {
-		return chartDataset;
+		return toReturnTaskSeries;
 	}
 
 }

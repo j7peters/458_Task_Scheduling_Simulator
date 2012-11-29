@@ -5,9 +5,13 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import view.MainView;
+import algorithms.DMSComparatorParent;
+import algorithms.DMSComparatorTaskInstance;
 import algorithms.DMSclass;
-import algorithms.DMSrefactor;
+import algorithms.RMSComparatorParent;
+import algorithms.RMSComparatorTaskInstance;
 import algorithms.RMSclass;
+import algorithms.Scheduler;
 import dataObjects.CPUTask;
 
 public class TaskSchedulerController {
@@ -115,11 +119,8 @@ public class TaskSchedulerController {
 
 	public void scheduleTasks(){
 		// RMS
-		RMSclass RMSscheduler = new RMSclass(this.taskList, this.view.RMSchartDataset);
-
-		if(RMSscheduler.createSchedule() && this.taskList.size() > 0){
-			this.view.RMSchartDataset = RMSscheduler.getChartDataset();
-			this.view.refreshChartPanel();
+		if(this.taskList.size() > 0){
+			this.view.RMSchartDataset = Scheduler.createSchedule(this.taskList, new RMSComparatorParent(), new RMSComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make RMS schedule.",
@@ -128,11 +129,9 @@ public class TaskSchedulerController {
 		}
 
 		// EDF
-		DMSrefactor EDFscheduler = new DMSrefactor(this.taskList, this.view.EDFchartDataset);
-
-		if(EDFscheduler.createSchedule() && this.taskList.size() > 0){
-			this.view.EDFchartDataset = EDFscheduler.getChartDataset();
-			this.view.refreshChartPanel();
+		if(this.taskList.size() > 0){
+			//TODO make edf
+			this.view.EDFchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make EDFschedule.",
@@ -141,11 +140,8 @@ public class TaskSchedulerController {
 		}
 
 		// DMS
-		DMSclass DMSscheduler = new DMSclass(this.taskList, this.view.DMSchartDataset);
-
-		if(DMSscheduler.createSchedule() && this.taskList.size() > 0){
-			this.view.DMSchartDataset = DMSscheduler.getChartDataset();
-			this.view.refreshChartPanel();
+		if(this.taskList.size() > 0){
+			this.view.DMSchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make DMS schedule.",
@@ -154,17 +150,18 @@ public class TaskSchedulerController {
 		}
 
 		// LLF
-		RMSclass LLFscheduler = new RMSclass(this.taskList, this.view.LLFchartDataset);
-
-		if(LLFscheduler.createSchedule() && this.taskList.size() > 0){
-			this.view.LLFchartDataset = LLFscheduler.getChartDataset();
-			this.view.refreshChartPanel();
+		if(this.taskList.size() > 0){
+			
+			//TODO make LLF
+			this.view.DMSchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make LLF schedule.",
 					"Scheduling` Error",
 					JOptionPane.ERROR_MESSAGE);
 		}
+		
+		this.view.refreshChartPanel();
 
 
 
