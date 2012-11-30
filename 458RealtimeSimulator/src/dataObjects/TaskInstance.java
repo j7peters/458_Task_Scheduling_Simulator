@@ -47,4 +47,12 @@ public class TaskInstance {
 		return this.laxity;
 	}
 	
+	public boolean isPastDeadline(int now){
+		if(now > this.deadline){
+			return true;
+		}
+		
+		return false;
+	}
+	
 }
