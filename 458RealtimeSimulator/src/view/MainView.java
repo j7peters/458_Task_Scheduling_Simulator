@@ -40,6 +40,10 @@ import controller.TaskSchedulerController;
 
 public class MainView extends JFrame implements ActionListener{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public IntervalCategoryDataset RMSchartDataset;
 	public IntervalCategoryDataset EDFchartDataset;
 	public IntervalCategoryDataset DMSchartDataset;
@@ -61,7 +65,7 @@ public class MainView extends JFrame implements ActionListener{
 
 	public JPanel myTaskListPane;
 
-	public JList myTaskList;
+	public JList<String> myTaskList;
 
 	public DefaultListModel<String> myTaskListModel;
 
@@ -323,7 +327,14 @@ public class MainView extends JFrame implements ActionListener{
 
 		// add the chart to a panel...
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(Util.tabWindowWidth-50, Util.tabWindowHeight-100));
+		
+		int numTasks = this.myTaskList.getModel().getSize();
+		int chartHeight = numTasks * 50 + 150;
+		if(chartHeight > Util.tabWindowHeight-75){
+			chartHeight = Util.tabWindowHeight-75;
+		}
+		
+		chartPanel.setPreferredSize(new java.awt.Dimension(Util.tabWindowWidth-50, chartHeight));
 		return chartPanel;
 	}
 
