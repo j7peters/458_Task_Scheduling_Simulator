@@ -48,7 +48,7 @@ public class TaskInstance {
 	}
 	
 	public boolean isPastDeadline(int now){
-		if(now > this.deadline){
+		if(now >= this.deadline){
 			return true;
 		}
 		

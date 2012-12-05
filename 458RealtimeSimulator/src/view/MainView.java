@@ -22,7 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -35,7 +37,6 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.IntervalCategoryDataset;
 
 import algorithms.Util;
-
 import controller.TaskSchedulerController;
 
 public class MainView extends JFrame implements ActionListener{
@@ -56,10 +57,20 @@ public class MainView extends JFrame implements ActionListener{
 	public ChartPanel DMSChartPanel;
 	public ChartPanel LLFChartPanel;
 
-	public JPanel RMSGanttPanel;
-	public JPanel EDFGanttPanel;
-	public JPanel DMSGanttPanel;
-	public JPanel LLFGanttPanel;
+	public JSplitPane RMSGanttPanel;
+	public JSplitPane EDFGanttPanel;
+	public JSplitPane DMSGanttPanel;
+	public JSplitPane LLFGanttPanel;
+
+	public JTextArea RMSTextArea = new JTextArea("1");
+	public JTextArea EDFTextArea = new JTextArea();
+	public JTextArea DMSTextArea = new JTextArea();
+	public JTextArea LLFTextArea = new JTextArea();
+
+	public JScrollPane RMSScrollPane = new JScrollPane(this.RMSTextArea);
+	public JScrollPane EDFScrollPane = new JScrollPane(this.EDFTextArea);
+	public JScrollPane DMSScrollPane = new JScrollPane(this.DMSTextArea);
+	public JScrollPane LLFScrollPane = new JScrollPane(this.LLFTextArea);
 
 	public JPanel myTaskEditorPanel;
 
@@ -116,18 +127,24 @@ public class MainView extends JFrame implements ActionListener{
 
 		this.myTabbedPane.add("Task Editor", this.myTaskSplitPane);
 
+		// Initialize Chart Panels
+		this.RMSChartPanel = getChartPanel(this.RMSchartDataset, "RMS Schedule");
+		this.EDFChartPanel = getChartPanel(this.EDFchartDataset, "EDF Schedule");
+		this.DMSChartPanel = getChartPanel(this.DMSchartDataset, "DMS Schedule");
+		this.LLFChartPanel = getChartPanel(this.LLFchartDataset, "LLF Schedule");
+
 		// RMS
-		this.RMSGanttPanel = new JPanel();
+		this.RMSGanttPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.RMSChartPanel, RMSScrollPane);
 
 		// EDF
-		this.EDFGanttPanel = new JPanel();
+		this.EDFGanttPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.EDFChartPanel, EDFScrollPane);
 
 		// DMS
-		this.DMSGanttPanel = new JPanel();
+		this.DMSGanttPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.DMSChartPanel, DMSScrollPane);
 
 		// LLF
-		this.LLFGanttPanel = new JPanel();
-		
+		this.LLFGanttPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.LLFChartPanel, LLFScrollPane);
+
 		this.myTabbedPane.add("RMS Schedule", this.RMSGanttPanel);
 		this.myTabbedPane.add("EDF Schedule", this.EDFGanttPanel);
 		this.myTabbedPane.add("DMS Schedule", this.DMSGanttPanel);
@@ -138,31 +155,40 @@ public class MainView extends JFrame implements ActionListener{
 		this.controller = new TaskSchedulerController(this);
 
 		setContentPane(this.myTabbedPane);
-		
+
 		this.myTabbedPane.setSelectedIndex(0);
 	}
 
 	public void refreshChartPanel(){
 		// RMS
-		this.RMSChartPanel = getChartPanel(this.RMSchartDataset);
-		this.RMSGanttPanel.removeAll();
+		this.RMSGanttPanel.remove(this.RMSChartPanel);
+		this.RMSChartPanel = getChartPanel(this.RMSchartDataset, "RMS Schedule");
 		this.RMSGanttPanel.add(this.RMSChartPanel);
 
 		// EDF
-		this.EDFChartPanel = getChartPanel(this.EDFchartDataset);
-		this.EDFGanttPanel.removeAll();
+		this.EDFGanttPanel.remove(this.EDFChartPanel);
+		this.EDFChartPanel = getChartPanel(this.EDFchartDataset, "EDF Schedule");
 		this.EDFGanttPanel.add(this.EDFChartPanel);
 
 		// DMS
-		this.DMSChartPanel = getChartPanel(this.DMSchartDataset);
-		this.DMSGanttPanel.removeAll();
+		this.DMSGanttPanel.remove(this.DMSChartPanel);
+		this.DMSChartPanel = getChartPanel(this.DMSchartDataset, "DMS Schedule");
 		this.DMSGanttPanel.add(this.DMSChartPanel);
 
 		// LLF
-		this.LLFChartPanel = getChartPanel(this.LLFchartDataset);
-		this.LLFGanttPanel.removeAll();
+		this.LLFGanttPanel.remove(this.LLFChartPanel);
+		this.LLFChartPanel = getChartPanel(this.LLFchartDataset, "LLF Schedule");
 		this.LLFGanttPanel.add(this.LLFChartPanel);
 
+		this.myTabbedPane.repaint();
+		
+		// resize scroll panes for text areas
+		this.RMSScrollPane.setPreferredSize(new Dimension(Util.tabWindowWidth, Util.textAreaHeight));
+		this.EDFScrollPane.setPreferredSize(new Dimension(Util.tabWindowWidth, Util.textAreaHeight));
+		this.DMSScrollPane.setPreferredSize(new Dimension(Util.tabWindowWidth, Util.textAreaHeight));
+		this.LLFScrollPane.setPreferredSize(new Dimension(Util.tabWindowWidth, Util.textAreaHeight));
+
+		
 		this.myTabbedPane.setSelectedIndex(1);
 	}
 
@@ -293,14 +319,14 @@ public class MainView extends JFrame implements ActionListener{
 	}
 
 
-	public ChartPanel getChartPanel(IntervalCategoryDataset chartInput){
+	public ChartPanel getChartPanel(IntervalCategoryDataset chartInput, String title){
 
 		final IntervalCategoryDataset dataset = chartInput;
 
 
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createGanttChart(
-				"Task Schedule",  // chart title
+				title,  // chart title
 				"Task",              // domain axis label
 				"Time",              // range axis label
 				dataset,             // data
@@ -328,13 +354,7 @@ public class MainView extends JFrame implements ActionListener{
 		// add the chart to a panel...
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		
-		int numTasks = this.myTaskList.getModel().getSize();
-		int chartHeight = numTasks * 50 + 150;
-		if(chartHeight > Util.tabWindowHeight-75){
-			chartHeight = Util.tabWindowHeight-75;
-		}
-		
-		chartPanel.setPreferredSize(new java.awt.Dimension(Util.tabWindowWidth-50, chartHeight));
+		chartPanel.setPreferredSize(new java.awt.Dimension(Util.tabWindowWidth-50, Util.chartHeight));
 		return chartPanel;
 	}
 

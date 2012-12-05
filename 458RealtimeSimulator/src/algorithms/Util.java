@@ -11,10 +11,15 @@ public class Util {
 	
 	public static final int tabWindowHeight = 500;
 	
+	public static final int textAreaHeight = 50;
+	
+	public static final int chartHeight = 350;
+	
 	private static int lcm(int a, int b)
 	{
 	    return a * (b / gcd(a, b));
 	}
+	
 
 	public static int lcm(int[] input)
 	{

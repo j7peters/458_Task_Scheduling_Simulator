@@ -154,7 +154,7 @@ public class TaskSchedulerController {
 	public void scheduleTasks(){
 		// RMS
 		if(this.taskList.size() > 0){
-			this.view.RMSchartDataset = Scheduler.createSchedule(this.taskList, new RMSComparatorParent(), new RMSComparatorTaskInstance());
+			this.view.RMSchartDataset = Scheduler.createSchedule(this.taskList, new RMSComparatorParent(), new RMSComparatorTaskInstance(), this.view.RMSTextArea);
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make RMS schedule.",
@@ -164,7 +164,7 @@ public class TaskSchedulerController {
 
 		// EDF
 		if(this.taskList.size() > 0){
-			this.view.EDFchartDataset = Scheduler.createSchedule(this.taskList, new EDFComparatorParent(), new EDFComparatorTaskInstance());
+			this.view.EDFchartDataset = Scheduler.createSchedule(this.taskList, new EDFComparatorParent(), new EDFComparatorTaskInstance(), this.view.EDFTextArea);
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make EDFschedule.",
@@ -174,7 +174,7 @@ public class TaskSchedulerController {
 
 		// DMS
 		if(this.taskList.size() > 0){
-			this.view.DMSchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance());
+			this.view.DMSchartDataset = Scheduler.createSchedule(this.taskList, new DMSComparatorParent(), new DMSComparatorTaskInstance(), this.view.DMSTextArea);
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make DMS schedule.",
@@ -184,7 +184,7 @@ public class TaskSchedulerController {
 
 		// LLF
 		if(this.taskList.size() > 0){
-			this.view.LLFchartDataset = Scheduler.createSchedule(this.taskList, new LLFComparatorParent(), new LLFComparatorTaskInstance());
+			this.view.LLFchartDataset = Scheduler.createSchedule(this.taskList, new LLFComparatorParent(), new LLFComparatorTaskInstance(), this.view.LLFTextArea);
 		} else {
 			JOptionPane.showMessageDialog(this.view.getContentPane(),
 					"Failed to make LLF schedule.",

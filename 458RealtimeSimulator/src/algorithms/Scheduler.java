@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JTextArea;
+
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
@@ -21,7 +23,7 @@ public class Scheduler {
 	 */
 	@SuppressWarnings("unchecked")
 	public static TaskSeriesCollection createSchedule(ArrayList<CPUTask> taskList,
-			Comparator<CPUTask> parentComparator, Comparator<TaskInstance> instanceComparator){
+			Comparator<CPUTask> parentComparator, Comparator<TaskInstance> instanceComparator, JTextArea textArea){
 
 		//create all variables needed
 		TaskSeriesCollection toReturnTaskSeries = new TaskSeriesCollection();
@@ -43,6 +45,8 @@ public class Scheduler {
 		int timeCurTaskStarted=0;
 
 		boolean curTimeUsed = false;
+		
+		boolean schedulingFailed = false;
 
 		TaskInstance newTaskInstance;
 
@@ -86,10 +90,10 @@ public class Scheduler {
 			taskInstances.add(new TaskInstance(1, 1, priorityTaskList.get(i), i));
 		}
 
-
+		int now;
 		/* Scheduling by looping through tasks */
 		//loop through and schedule all the tasks based on priority
-		for(int now = 1; now<=lcm;){
+		for(now = 1; now<=lcm;){
 			curTimeUsed = false;
 
 			//recalculate laxity for each task incase this is running LLF
@@ -103,9 +107,19 @@ public class Scheduler {
 				if(taskInstances.get(j).readyTime <= now){
 
 					if(taskInstances.get(j).remainingTime > 0 && taskInstances.get(j).isPastDeadline(now) ){
+						TaskInstance tFail = taskInstances.get(j);
 						//This is past the deadline
-						System.err.println("Fail: now="+ (now) +", name = " + taskInstances.get(j).parentTask.name);
+						System.err.println("Fail: now="+ (now) +", name = " + tFail.parentTask.name);
 						
+						//print output to the text area
+						if(schedulingFailed == false){
+							textArea.setText("Scheduling Failed:\n");
+							schedulingFailed = true;							
+						}
+						textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
+						
+						
+						// try to move on.
 						newTaskInstance = new TaskInstance(	taskInstances.get(j).instanceNumber + 1, 
 								taskInstances.get(j).readyTime + taskInstances.get(j).parentTask.period, 
 								taskInstances.get(j).parentTask, 
@@ -119,12 +133,12 @@ public class Scheduler {
 					}
 					
 					if(taskInstances.get(j).equals(curTaskInstance)){
-						//TODO nothing??
+						// nothing necessary
 					} else {
+						//signals a context switch
 						if(curTaskInstance != null){
 							//finish up previous task
 							final Task st32 = Util.createTask(curTaskInstance.parentTask.getName(), timeCurTaskStarted, now);
-							st32.setPercentComplete(1.0);
 							graphTasks.get(curTaskInstance.parentTask.name).addSubtask(st32);
 						}
 
@@ -141,7 +155,6 @@ public class Scheduler {
 					//finish up previous task if it is finished
 					if(taskInstances.get(j).remainingTime < 1){
 						final Task st32 = Util.createTask(curTaskInstance.parentTask.getName(), timeCurTaskStarted, now);
-						st32.setPercentComplete(1.0);
 						graphTasks.get(curTaskInstance.parentTask.name).addSubtask(st32);
 
 						newTaskInstance = new TaskInstance(	taskInstances.get(j).instanceNumber + 1, 
@@ -165,10 +178,27 @@ public class Scheduler {
 				now++;
 			}
 		}
+		
+		for(int j=0; j<numTasks; j++){
+			if(taskInstances.get(j).isPastDeadline(now)){
+				TaskInstance tFail = taskInstances.get(j);
+				//This is past the deadline
+				if(schedulingFailed == false){
+					textArea.setText("Scheduling Failed:\n");
+					schedulingFailed = true;							
+				}
+				textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
+				
+			}
+		}
 
 
 		//return the taskseries with the graphed tasks added to it.
 		toReturnTaskSeries.add(s1);
+		
+		if(schedulingFailed == false){
+			textArea.setText("Scheduling Succeeded!\n");
+		}
 
 		return toReturnTaskSeries;
 	}
@@ -178,6 +208,5 @@ public class Scheduler {
 			ti.computeLaxity(curTime);
 		}
 	}
-
 }
 
