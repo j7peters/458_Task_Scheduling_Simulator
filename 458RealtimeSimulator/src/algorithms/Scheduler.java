@@ -45,7 +45,7 @@ public class Scheduler {
 		int timeCurTaskStarted=0;
 
 		boolean curTimeUsed = false;
-		
+
 		boolean schedulingFailed = false;
 
 		TaskInstance newTaskInstance;
@@ -79,7 +79,6 @@ public class Scheduler {
 		//setup tasks
 		for(int i=0; i<numTasks; i++){
 			graphTasks.put(TaskNames.get(i), Util.createTask(TaskNames.get(i), 1, lcm));
-			s1.add(graphTasks.get(TaskNames.get(i)));
 		}
 
 		//Sort the parent tasks based on comparator
@@ -110,15 +109,15 @@ public class Scheduler {
 						TaskInstance tFail = taskInstances.get(j);
 						//This is past the deadline
 						System.err.println("Fail: now="+ (now) +", name = " + tFail.parentTask.name);
-						
+
 						//print output to the text area
 						if(schedulingFailed == false){
 							textArea.setText("Scheduling Failed:\n");
 							schedulingFailed = true;							
 						}
 						textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
-						
-						
+
+
 						// try to move on.
 						newTaskInstance = new TaskInstance(	taskInstances.get(j).instanceNumber + 1, 
 								taskInstances.get(j).readyTime + taskInstances.get(j).parentTask.period, 
@@ -126,12 +125,12 @@ public class Scheduler {
 								j);
 						taskInstances.remove(j);
 						taskInstances.add(j, newTaskInstance);
-						
+
 						//redo this round of the loop
 						j--;
 						continue;
 					}
-					
+
 					if(taskInstances.get(j).equals(curTaskInstance)){
 						// nothing necessary
 					} else {
@@ -166,8 +165,8 @@ public class Scheduler {
 
 						curTaskInstance = null;
 					}
-					
-					
+
+
 
 					System.out.println("now="+ (now-1) +", name = " + taskInstances.get(j).parentTask.name);
 
@@ -178,7 +177,7 @@ public class Scheduler {
 				now++;
 			}
 		}
-		
+
 		for(int j=0; j<numTasks; j++){
 			if(taskInstances.get(j).isPastDeadline(now)){
 				TaskInstance tFail = taskInstances.get(j);
@@ -188,14 +187,26 @@ public class Scheduler {
 					schedulingFailed = true;							
 				}
 				textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
-				
+
+			}
+		}
+
+		//TODO make not scheduled tasks not show up the whole time. 
+		// do this by not adding anything to the s1 until now, then check of tasks have subtasks before adding.
+		//setup tasks
+		for(int i=0; i<numTasks; i++){
+			Task tmpTask = graphTasks.get(TaskNames.get(i));
+			if (tmpTask.getSubtaskCount() > 0 ){
+				s1.add(graphTasks.get(TaskNames.get(i)));				
+			} else {
+				s1.add(Util.createTask(TaskNames.get(i), 1, 1));
 			}
 		}
 
 
 		//return the taskseries with the graphed tasks added to it.
 		toReturnTaskSeries.add(s1);
-		
+
 		if(schedulingFailed == false){
 			textArea.setText("Scheduling Succeeded!\n");
 		}

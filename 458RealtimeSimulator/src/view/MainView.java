@@ -24,7 +24,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -331,7 +330,7 @@ public class MainView extends JFrame implements ActionListener{
 				"Time",              // range axis label
 				dataset,             // data
 				true,                // include legend
-				true,                // tooltips
+				false,               // tooltips
 				false                // urls
 				);
 		// set format so displays years, looks like integers allows us large range
