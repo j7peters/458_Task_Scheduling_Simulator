@@ -61,7 +61,7 @@ public class MainView extends JFrame implements ActionListener{
 	public JSplitPane DMSGanttPanel;
 	public JSplitPane LLFGanttPanel;
 
-	public JTextArea RMSTextArea = new JTextArea("1");
+	public JTextArea RMSTextArea = new JTextArea();
 	public JTextArea EDFTextArea = new JTextArea();
 	public JTextArea DMSTextArea = new JTextArea();
 	public JTextArea LLFTextArea = new JTextArea();

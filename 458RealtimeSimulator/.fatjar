@@ -1,9 +1,9 @@
 #Fat Jar Configuration File
-#Tue Dec 04 13:55:38 CST 2012
+#Thu Dec 13 14:00:41 CST 2012
 onejar.license.required=false
 manifest.classpath=
 manifest.removesigners=true
-onejar.checkbox=true
+onejar.checkbox=false
 jarname=458RealtimeSimulator.jar
 manifest.mergeall=true
 manifest.mainclass=view.MainView
