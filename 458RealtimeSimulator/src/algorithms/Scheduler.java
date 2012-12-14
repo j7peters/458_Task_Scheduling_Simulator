@@ -178,6 +178,7 @@ public class Scheduler {
 			}
 		}
 
+		// Check which tasks fail to meet final deadline
 		for(int j=0; j<numTasks; j++){
 			if(taskInstances.get(j).isPastDeadline(now)){
 				TaskInstance tFail = taskInstances.get(j);
@@ -187,7 +188,18 @@ public class Scheduler {
 					schedulingFailed = true;							
 				}
 				textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
+				
+				// add another task, to make sure that all instance failures are reported.
+				newTaskInstance = new TaskInstance(	taskInstances.get(j).instanceNumber + 1, 
+						taskInstances.get(j).readyTime + taskInstances.get(j).parentTask.period, 
+						taskInstances.get(j).parentTask, 
+						j);
+				taskInstances.remove(j);
+				taskInstances.add(j, newTaskInstance);
 
+				//redo this round of the loop
+				j--;
+				continue;
 			}
 		}
 
