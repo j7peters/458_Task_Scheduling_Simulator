@@ -95,17 +95,20 @@ public class Scheduler {
 		for(now = 1; now<=lcm;){
 			curTimeUsed = false;
 
+			// Check which tasks fail to meet final deadline
+			schedulingFailed = checkTaskDeadlines(schedulingFailed, taskInstances, now, textArea);
+
 			//recalculate laxity for each task incase this is running LLF
 			computeTaskLaxities(taskInstances, now);
 
 			//resort the task instances for dynamic priority algorithms
 			Collections.sort(taskInstances, instanceComparator);
-
+			
 			for(int j=0; j<numTasks && curTimeUsed == false; j++){
 
 				if(taskInstances.get(j).readyTime <= now){
 
-					if(taskInstances.get(j).remainingTime > 0 && taskInstances.get(j).isPastDeadline(now) ){
+					/*if(taskInstances.get(j).remainingTime > 0 && taskInstances.get(j).isPastDeadline(now) ){
 						TaskInstance tFail = taskInstances.get(j);
 						//This is past the deadline
 						System.err.println("Fail: now="+ (now) +", name = " + tFail.parentTask.name);
@@ -129,7 +132,7 @@ public class Scheduler {
 						//redo this round of the loop
 						j--;
 						continue;
-					}
+					}*/
 
 					if(taskInstances.get(j).equals(curTaskInstance)){
 						// nothing necessary
@@ -179,6 +182,8 @@ public class Scheduler {
 		}
 
 		// Check which tasks fail to meet final deadline
+		schedulingFailed = checkTaskDeadlines(schedulingFailed, taskInstances, now, textArea);
+/* may not be needed.
 		for(int j=0; j<numTasks; j++){
 			if(taskInstances.get(j).isPastDeadline(now)){
 				TaskInstance tFail = taskInstances.get(j);
@@ -188,7 +193,7 @@ public class Scheduler {
 					schedulingFailed = true;							
 				}
 				textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
-				
+
 				// add another task, to make sure that all instance failures are reported.
 				newTaskInstance = new TaskInstance(	taskInstances.get(j).instanceNumber + 1, 
 						taskInstances.get(j).readyTime + taskInstances.get(j).parentTask.period, 
@@ -202,6 +207,7 @@ public class Scheduler {
 				continue;
 			}
 		}
+		*/
 
 		//TODO make not scheduled tasks not show up the whole time. 
 		// do this by not adding anything to the s1 until now, then check of tasks have subtasks before adding.
@@ -230,6 +236,38 @@ public class Scheduler {
 		for( TaskInstance ti : taskInstances){
 			ti.computeLaxity(curTime);
 		}
+	}
+
+	public static boolean checkTaskDeadlines(boolean schedulingFailed, ArrayList<TaskInstance> taskInstances, int curTime, JTextArea textArea){
+		int numTasks = taskInstances.size();
+		for(int j=0; j<numTasks; j++){
+			if(taskInstances.get(j).remainingTime > 0 && taskInstances.get(j).isPastDeadline(curTime) ){
+				TaskInstance tFail = taskInstances.get(j);
+				//This is past the deadline
+				System.err.println("Fail: now="+ (curTime) +", name = " + tFail.parentTask.name);
+
+				//print output to the text area
+				if(schedulingFailed == false){
+					textArea.setText("Scheduling Failed:\n");
+					schedulingFailed = true;							
+				}
+				textArea.append("\tAt time "+ tFail.deadline +",\tTask: "+ tFail.parentTask.name + ",\tInstance # "+ tFail.instanceNumber + ",\tMissed its deadline\n");
+
+
+				// try to move on.
+				TaskInstance newTaskInstance = new TaskInstance(taskInstances.get(j).instanceNumber + 1, 
+						taskInstances.get(j).readyTime + taskInstances.get(j).parentTask.period, 
+						taskInstances.get(j).parentTask, 
+						j);
+				taskInstances.remove(j);
+				taskInstances.add(j, newTaskInstance);
+
+				//redo this round of the loop
+				j--;
+				continue;
+			}
+		}
+		return schedulingFailed;
 	}
 }
 
